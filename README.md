@@ -7,18 +7,13 @@
     </picture>
   </a>
 </p>
-<h1 align="center">
-  Medusa
-</h1>
 
-<h4 align="center">
-  <a href="https://docs.medusajs.com">Documentation</a> |
-  <a href="https://www.medusajs.com">Website</a>
-</h4>
+<h1 align="center">Medusa — README técnico</h1>
 
 <p align="center">
-  Building blocks for digital commerce
+  Instrucciones de instalación local con Docker Compose, variables de entorno y estructura del proyecto.
 </p>
+
 <p align="center">
   <a href="https://github.com/medusajs/medusa/blob/develop/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Medusa is released under the MIT license." />
@@ -26,48 +21,144 @@
   <a href="https://github.com/medusajs/medusa/blob/develop/CONTRIBUTING.md">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
   </a>
- <p align="center">
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
   <a href="https://discord.gg/medusajs">
     <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
   </a>
 </p>
 
-## Getting Started
+---
 
-The fastest way to get started is with [Medusa Cloud](https://medusajs.com/cloud/). It provides a managed environment optimized for Medusa applications, with automated deployments, scaling, and maintenance. [Get started on Medusa Cloud](https://cloud.medusajs.com)
+## 🚀 Instalación local con Docker Compose
 
-To set up a Medusa application locally, visit the [Documentation](https://docs.medusajs.com/learn).
+Este proyecto utiliza **Docker Compose** para levantar todos los servicios necesarios con un único comando.
 
-## About Medusa
+### Requisitos previos
 
-Medusa is a commerce platform with a built-in framework for customization that allows you to build custom commerce applications without reinventing core commerce logic. The framework and modules can be used to support advanced B2B or DTC commerce stores, marketplaces, distributor platforms, PoS systems, service businesses, or similar solutions that need foundational commerce primitives. All commerce modules are open-source and freely available on npm.
+- [Docker](https://docs.docker.com/get-docker/) >= 20.x
+- [Docker Compose](https://docs.docker.com/compose/install/) >= 2.x
+- [Node.js](https://nodejs.org/) >= 20.x (solo para desarrollo fuera de Docker)
 
-Learn more about [Medusa’s architecture](https://docs.medusajs.com/learn/advanced-development/architecture/overview) and [commerce modules](https://docs.medusajs.com/resources/commerce-modules) in the Docs.
+### Pasos para levantar el entorno
 
-## Upgrades & Integrations
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/<tu-usuario>/medusa-project.git
+cd medusa-project
 
-Follow the [Release Notes](https://github.com/medusajs/medusa/releases) to keep your Medusa project up-to-date.
+# 2. Copiar el archivo de variables de entorno
+cp .env.example .env
 
-Check out all [available Medusa integrations](https://medusajs.com/integrations/).
+# 3. Levantar todos los servicios con Docker Compose
+docker compose up --build
+```
 
-## Community & Contributions
+Los servicios disponibles después del arranque serán:
 
-The core team is available in [GitHub Discussions](https://github.com/medusajs/medusa/discussions), where you can create issues, share ideas, and discuss roadmap.
+| Servicio       | URL                         | Descripción                        |
+|----------------|-----------------------------|------------------------------------|
+| Backend API    | http://localhost:9000       | API REST de MedusaJS               |
+| Admin Panel    | http://localhost:7001       | Panel administrativo (React)       |
+| Storefront     | http://localhost:8000       | Tienda en línea (Next.js)          |
+| PostgreSQL     | localhost:5432              | Base de datos principal            |
+| Redis          | localhost:6379              | Caché y colas de trabajo           |
 
-Our [Contribution Guide](https://github.com/medusajs/medusa/blob/develop/CONTRIBUTING.md) describes how to contribute to the codebase and Docs.
+---
 
-Join our [Discord server](https://discord.gg/medusajs) to meet and discuss with more than 14,000 other community members.
+## 🔐 Variables de entorno
 
-## Other channels
+Copia el archivo `.env.example` como `.env` y ajusta los valores según tu entorno local.
 
-- [GitHub Issues](https://github.com/medusajs/medusa/issues)
-- [Community Discord](https://discord.gg/medusajs)
-- [Twitter](https://twitter.com/medusajs)
-- [LinkedIn](https://www.linkedin.com/company/medusajs)
-- [Medusa Blog](https://medusajs.com/blog/)
+```env
+# Base de datos
+DATABASE_URL=postgres://medusa:medusa@postgres:5432/medusadb
 
-## License
+# Redis
+REDIS_URL=redis://redis:6379
 
-Licensed under the [MIT License](https://github.com/medusajs/medusa/blob/develop/LICENSE).
+# JWT y cookies
+JWT_SECRET=tu_secreto_jwt_aqui
+COOKIE_SECRET=tu_secreto_cookie_aqui
+
+# Admin
+MEDUSA_ADMIN_EMAIL=admin@ejemplo.com
+MEDUSA_ADMIN_PASSWORD=adminpass123
+
+# Entorno
+NODE_ENV=development
+```
+
+> ⚠️ **Nunca subas tu archivo `.env` real al repositorio.** Está incluido en `.gitignore`.
+
+---
+
+## 🗂️ Estructura del proyecto
+
+```
+medusa-project/
+├── backend/                  # Servidor MedusaJS (Node.js + TypeScript)
+│   ├── src/
+│   │   ├── api/              # Endpoints personalizados
+│   │   ├── modules/          # Módulos extendidos (Productos, Pedidos)
+│   │   ├── subscribers/      # Listeners de eventos
+│   │   └── workflows/        # Flujos de negocio
+│   ├── medusa-config.ts      # Configuración principal de Medusa
+│   └── Dockerfile
+│
+├── storefront/               # Frontend de la tienda (Next.js)
+│   ├── src/
+│   │   ├── app/              # App Router de Next.js
+│   │   ├── components/       # Componentes reutilizables
+│   │   └── lib/              # Utilidades y cliente de la API
+│   └── Dockerfile
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml            # Pipeline CI/CD (lint + test + build)
+│       └── burndown.yml      # Generación automática de burndown chart
+│
+├── docker-compose.yml        # Orquestación de todos los servicios
+├── .env.example              # Plantilla de variables de entorno
+└── README.md
+```
+
+---
+
+## 🧪 Ejecutar pruebas
+
+```bash
+# Dentro del contenedor de backend
+docker compose exec backend npm run test
+
+# O directamente desde la raíz (requiere Node.js local)
+cd backend && npm run test
+```
+
+---
+
+## 🔄 Pipeline CI/CD
+
+El proyecto cuenta con un pipeline automatizado en **GitHub Actions** que se ejecuta en cada `push` o `pull request`:
+
+1. **Lint** — Verifica el estilo del código con ESLint
+2. **Test** — Ejecuta la suite de pruebas unitarias
+3. **Build** — Compila el proyecto TypeScript
+4. **Deploy** — Despliega a staging en GitHub Pages (solo en rama `main`)
+
+---
+
+## 👥 Equipo de trabajo
+
+| Integrante | Rol Scrum |
+|---|---|
+| Rodrigo Flores Núñez | Scrum Master (Sprint 0, 4) |
+| Mijael Leon Ramos | Scrum Master (Sprint 1) |
+| Mauricio Paredes Miranda | Scrum Master (Sprint 2) |
+| Fabricio Jimenez Paredes | Scrum Master (Sprint 3) |
+
+> Todos los integrantes forman parte del **Development Team**: desarrollo, pruebas y documentación técnica.
+
+---
+
+## 📄 Licencia
+
+Licenciado bajo la [MIT License](https://github.com/medusajs/medusa/blob/develop/LICENSE).
